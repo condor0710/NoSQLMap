@@ -454,7 +454,16 @@ def options():
                 input("error reading file.  Press enter to continue...")
                 return
 
+            if len(reqData) < 2:
+                print("Invalid Burp request file format. File too short.")
+                input("Press enter to continue...")
+                return
+
             methodPath = reqData[0].split(" ")
+            if len(methodPath) < 2:
+                print("Invalid request line format.")
+                input("Press enter to continue...")
+                return
 
             if methodPath[0] == "GET":
                 httpMethod = "GET"
@@ -468,24 +477,46 @@ def options():
                 paramsNvalues = postData.split("&")
 
                 for item in paramsNvalues:
-                    tempList = item.split("=")
-                    paramNames.append(tempList[0])
-                    paramValues.append(tempList[1])
+                    if item.strip():  # Skip empty items
+                        tempList = item.split("=")
+                        if len(tempList) >= 2:
+                            paramNames.append(tempList[0])
+                            paramValues.append(tempList[1])
+                        elif len(tempList) == 1:
+                            # Parameter without value
+                            paramNames.append(tempList[0])
+                            paramValues.append("")
 
                 postData = dict(zip(paramNames,paramValues))
 
             else:
                 print("unsupported method in request header.")
+                input("Press enter to continue...")
+                return
 
             # load the HTTP headers
             for line in reqData[1:]:
                 print(line)
                 if not line.strip(): break
-                header = line.split(": ");
-                requestHeaders[header[0]] = header[1].strip()
+                if ":" in line:
+                    header = line.split(": ", 1)  # Split only on first colon
+                    if len(header) >= 2:
+                        requestHeaders[header[0]] = header[1].strip()
 
-            victim = reqData[1].split( " ")[1]
-            optionSet[0] = True
+            # Extract victim from Host header or request line
+            try:
+                if len(reqData) > 1 and " " in reqData[1]:
+                    victim = reqData[1].split(" ")[1]
+                    optionSet[0] = True
+                else:
+                    print("Could not extract target from request file.")
+                    input("Press enter to continue...")
+                    return
+            except IndexError:
+                print("Invalid request format.")
+                input("Press enter to continue...")
+                return
+
             uri = methodPath[1]
             optionSet[2] = True
 

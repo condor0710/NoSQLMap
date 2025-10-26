@@ -16,7 +16,7 @@ with open("README.md", encoding='utf-8') as f:
 			
 			install_requires = [ "CouchDB>=1.2", "httplib2>=0.19.0", "ipcalc>=1.1.3",\
 								 "pbkdf2>=1.3", "pymongo>=4.0.0",\
-								 "requests>=2.25.0"],
+								 "requests>=2.25.0", "six>=1.16.0"],
 	
 			author = "tcstool",
 			author_email = "codingo@protonmail.com",

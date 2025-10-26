@@ -1,12 +1,16 @@
 # NoSQLMap
 
-[![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/)
+[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-GPLv3-red.svg)](https://github.com/codingo/NoSQLMap/blob/master/COPYING)
 [![Twitter](https://img.shields.io/badge/twitter-@codingo__-blue.svg)](https://twitter.com/codingo_)
 
 NoSQLMap is an open source Python tool designed to audit for as well as automate injection attacks and exploit default configuration weaknesses in NoSQL databases and web applications using NoSQL in order to disclose or clone data from the database.
 
 Originally authored by [@tcsstool](https://twitter.com/tcstoolHax0r) and now maintained by [@codingo\_](https://twitter.com/codingo_) NoSQLMap is named as a tribute to Bernardo Damele and Miroslav's Stampar's popular SQL injection tool [sqlmap](http://sqlmap.org). Its concepts are based on and extensions of Ming Chow's excellent presentation at Defcon 21, ["Abusing NoSQL Databases"](https://www.defcon.org/images/defcon-21/dc-21-presentations/Chow/DEFCON-21-Chow-Abusing-NoSQL-Databases.pdf).
+
+## ⚠️ Python 3 Compatibility Update
+
+**This version has been updated to work with Python 3.6+** (previously required Python 2.6/2.7). All syntax has been modernized and dependencies updated for Python 3 compatibility.
 
 ## NoSQLMap MongoDB Management Attack Demo.
 
@@ -28,22 +32,42 @@ Presently the tool's exploits are focused around MongoDB, and CouchDB but additi
 
 ## Requirements
 
-On a Debian or Red Hat based system, the setup.sh script may be run as root to automate the installation of NoSQLMap's dependencies.
+**Python 3.6+** (Updated from Python 2.6/2.7)
 
-Varies based on features used:
+Dependencies can be installed using pip:
 
--   Metasploit Framework,
--   Python with PyMongo,
--   httplib2,
--   and urllib available.
+```bash
+pip install -r requirements.txt
+```
+
+Or manually install:
+-   Python 3.6+ with PyMongo 4.0+
+-   CouchDB 1.2+
+-   httplib2 0.19.0+
+-   requests 2.25.0+
+-   ipcalc 1.1.3+
+-   pbkdf2 1.3+
+-   six 1.16.0+
 -   A local, default MongoDB instance for cloning databases to. Check [here](http://docs.mongodb.org/manual/installation/) for installation instructions.
 
-There are some various other libraries required that a normal Python installation should have readily available. Your milage may vary, check the script.
+Optional:
+-   Metasploit Framework (for exploit features)
 
 ## Setup
 
-```
+**Python 3 Installation:**
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Install NoSQLMap
 python setup.py install
+```
+
+**Or run directly:**
+```bash
+python nosqlmap.py
 ```
 
 Alternatively you can build a Docker image by changing to the docker directory and entering:
