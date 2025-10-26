@@ -90,10 +90,11 @@ def getApps(webPort,victim,uri,https,verb,requestHeaders, args = None):
         appURL = "https://" + str(victim).strip() + ":" + str(webPort).strip() + str(uri).strip()
     try:
         req = urllib.request.Request(appURL, None, requestHeaders)
-        appRespCode = urllib.request.urlopen(req).getcode()
+        # Add timeout and better error handling for Python 3
+        appRespCode = urllib.request.urlopen(req, timeout=10).getcode()
         if appRespCode == 200:
             normLength = int(len(getResponseBodyHandlingErrors(req)))
-            timeReq = urllib.request.urlopen(req)
+            timeReq = urllib.request.urlopen(req, timeout=10)
             start = time.time()
             page = timeReq.read()
             end = time.time()
@@ -108,8 +109,11 @@ def getApps(webPort,victim,uri,https,verb,requestHeaders, args = None):
 
         else:
             print("Got " + str(appRespCode) + "from the app, check your options.")
+    except urllib.error.URLError as e:
+        print("URL Error: " + str(e))
+        print("Check your target hostname/IP and network connectivity.")
     except Exception as e:
-        print(e)
+        print("Error: " + str(e))
         print("Looks like the server didn't respond.  Check your options.")
 
     if appUp == True:
@@ -385,9 +389,12 @@ def getApps(webPort,victim,uri,https,verb,requestHeaders, args = None):
 
 def getResponseBodyHandlingErrors(req):
     try:
-        responseBody = urllib.request.urlopen(req).read()
+        responseBody = urllib.request.urlopen(req, timeout=10).read()
     except urllib.error.HTTPError as err:
         responseBody = err.read()
+    except urllib.error.URLError as e:
+        print("URL Error in response handling: " + str(e))
+        responseBody = b""
     
     return responseBody
 
@@ -426,12 +433,12 @@ def postApps(victim,webPort,uri,https,verb,postData,requestHeaders, args = None)
     try:
         body = urllib.parse.urlencode(postData).encode()
         req = urllib.request.Request(appURL,body, requestHeaders)
-        appRespCode = urllib.request.urlopen(req).getcode()
+        appRespCode = urllib.request.urlopen(req, timeout=10).getcode()
 
         if appRespCode == 200:
 
             normLength = int(len(getResponseBodyHandlingErrors(req)))
-            timeReq = urllib.request.urlopen(req)
+            timeReq = urllib.request.urlopen(req, timeout=10)
             start = time.time()
             page = timeReq.read()
             end = time.time()
@@ -447,8 +454,11 @@ def postApps(victim,webPort,uri,https,verb,postData,requestHeaders, args = None)
         else:
             print("Got " + str(appRespCode) + "from the app, check your options.")
 
+    except urllib.error.URLError as e:
+        print("URL Error: " + str(e))
+        print("Check your target hostname/IP and network connectivity.")
     except Exception as e:
-        print(e)
+        print("Error: " + str(e))
         print("Looks like the server didn't respond.  Check your options.")
 
     if appUp == True:
