@@ -473,21 +473,41 @@ def options():
                 paramValues = []
                 httpMethod = "POST"
                 postData = reqData[len(reqData)-1]
-                # split the POST parameters up into individual items
-                paramsNvalues = postData.split("&")
+                
+                # Check if it's JSON content
+                is_json = False
+                for line in reqData:
+                    if "Content-Type: application/json" in line:
+                        is_json = True
+                        break
+                
+                if is_json:
+                    # Handle JSON payload
+                    try:
+                        import json
+                        json_data = json.loads(postData)
+                        postData = json_data
+                        print("Detected JSON payload: " + str(postData))
+                    except json.JSONDecodeError:
+                        print("Invalid JSON in request body, treating as form data")
+                        is_json = False
+                
+                if not is_json:
+                    # Handle form-encoded data
+                    paramsNvalues = postData.split("&")
 
-                for item in paramsNvalues:
-                    if item.strip():  # Skip empty items
-                        tempList = item.split("=")
-                        if len(tempList) >= 2:
-                            paramNames.append(tempList[0])
-                            paramValues.append(tempList[1])
-                        elif len(tempList) == 1:
-                            # Parameter without value
-                            paramNames.append(tempList[0])
-                            paramValues.append("")
+                    for item in paramsNvalues:
+                        if item.strip():  # Skip empty items
+                            tempList = item.split("=")
+                            if len(tempList) >= 2:
+                                paramNames.append(tempList[0])
+                                paramValues.append(tempList[1])
+                            elif len(tempList) == 1:
+                                # Parameter without value
+                                paramNames.append(tempList[0])
+                                paramValues.append("")
 
-                postData = dict(zip(paramNames,paramValues))
+                    postData = dict(zip(paramNames,paramValues))
 
             else:
                 print("unsupported method in request header.")

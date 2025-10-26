@@ -431,7 +431,19 @@ def postApps(victim,webPort,uri,https,verb,postData,requestHeaders, args = None)
         appURL = "https://" + str(victim) + ":" + str(webPort) + str(uri)
 
     try:
-        body = urllib.parse.urlencode(postData).encode()
+        # Check if we're dealing with JSON data
+        if isinstance(postData, dict) and any(isinstance(v, (dict, list)) for v in postData.values()):
+            # JSON data - encode as JSON
+            import json
+            body = json.dumps(postData).encode('utf-8')
+            if 'Content-Type' not in requestHeaders:
+                requestHeaders['Content-Type'] = 'application/json'
+        else:
+            # Form data - encode as URL-encoded
+            body = urllib.parse.urlencode(postData).encode()
+            if 'Content-Type' not in requestHeaders:
+                requestHeaders['Content-Type'] = 'application/x-www-form-urlencoded'
+        
         req = urllib.request.Request(appURL,body, requestHeaders)
         appRespCode = urllib.request.urlopen(req, timeout=10).getcode()
 
@@ -508,7 +520,17 @@ def postApps(victim,webPort,uri,https,verb,postData,requestHeaders, args = None)
         else:
             print("Sending random parameter value...")
 
-        body = urllib.parse.urlencode(postData).encode()
+        # Handle JSON vs form data encoding
+        if isinstance(postData, dict) and any(isinstance(v, (dict, list)) for v in postData.values()):
+            import json
+            body = json.dumps(postData).encode('utf-8')
+            if 'Content-Type' not in requestHeaders:
+                requestHeaders['Content-Type'] = 'application/json'
+        else:
+            body = urllib.parse.urlencode(postData).encode()
+            if 'Content-Type' not in requestHeaders:
+                requestHeaders['Content-Type'] = 'application/x-www-form-urlencoded'
+        
         req = urllib.request.Request(appURL,body, requestHeaders)
         randLength = int(len(getResponseBodyHandlingErrors(req)))
         print("Got response length of " + str(randLength) + ".")
@@ -524,7 +546,14 @@ def postApps(victim,webPort,uri,https,verb,postData,requestHeaders, args = None)
         neDict = postData.copy()
         neDict[injOpt + "[$ne]"] = neDict[injOpt]
         del neDict[injOpt]
-        body = urllib.parse.urlencode(neDict).encode()
+        
+        # Handle JSON vs form data encoding for injection
+        if isinstance(neDict, dict) and any(isinstance(v, (dict, list)) for v in neDict.values()):
+            import json
+            body = json.dumps(neDict).encode('utf-8')
+        else:
+            body = urllib.parse.urlencode(neDict).encode()
+        
         req = urllib.request.Request(appURL,body, requestHeaders)
         if verb == "ON":
             print("Testing Mongo PHP not equals associative array injection using " + str(postData) +"...")
